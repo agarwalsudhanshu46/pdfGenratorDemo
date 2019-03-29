@@ -11,7 +11,7 @@ import lombok.Setter;
 
 
 @JsonTypeName("Student")
-public class Student extends Candidate implements Serializable {
+public class Student<T> extends Candidate implements Serializable {
 
 	public Student() {
 		super();

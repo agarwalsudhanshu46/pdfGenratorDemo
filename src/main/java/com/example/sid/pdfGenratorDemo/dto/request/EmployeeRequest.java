@@ -20,6 +20,7 @@ public class EmployeeRequest extends CandidateRequest implements Serializable {
 
 	@JsonProperty(value = "city")
 	private final String city;
+	
 
 	public EmployeeRequest(String firstName, String lastName, int employeeId, String city) {
 		super(firstName, lastName);

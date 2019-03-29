@@ -10,7 +10,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @JsonTypeName("Employee")
-public class Employee extends Candidate implements Serializable {
+public class Employee<T> extends Candidate implements Serializable {
 
 	private static final long serialVersionUID = -1221794581857450594L;
 

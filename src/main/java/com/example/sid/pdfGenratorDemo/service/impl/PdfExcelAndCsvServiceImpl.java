@@ -20,6 +20,7 @@ import org.apache.poi.hssf.util.HSSFColor;
 import org.springframework.stereotype.Service;
 
 import com.example.sid.pdfGenratorDemo.dto.response.Employee;
+import com.example.sid.pdfGenratorDemo.dto.response.Student;
 import com.example.sid.pdfGenratorDemo.service.PdfExcelAndCsvService;
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Document;
@@ -39,7 +40,7 @@ import au.com.bytecode.opencsv.CSVWriter;
 public class PdfExcelAndCsvServiceImpl<T> implements PdfExcelAndCsvService<T> {
 
 	@Override
-	public boolean createPdf(List<T> employees, ServletContext context, HttpServletRequest request,
+	public boolean createPdf(List<T> candidates, ServletContext context, HttpServletRequest request,
 			HttpServletResponse response) {
 		Document document = new Document(PageSize.A4, 15, 15, 45, 30);
 
@@ -64,12 +65,13 @@ public class PdfExcelAndCsvServiceImpl<T> implements PdfExcelAndCsvService<T> {
 
 			float[] columnWidths = { 2f, 2f, 2f, 2f };
 			pdfTable.setWidths(columnWidths);
-
+			
 			createPdfHeader(pdfTable, tableHeader);
 
-/*			for (Employee employee : employees) {
+/*			for (T employee : employees) {
 				createPdfRow(pdfTable, tableBody, employee);
 			}*/
+			candidates.forEach(candidate -> createPdfRow(pdfTable, tableBody, candidate));
 
 			document.add(pdfTable);
 			document.close();
@@ -99,21 +101,25 @@ public class PdfExcelAndCsvServiceImpl<T> implements PdfExcelAndCsvService<T> {
 		document.add(paragraph);
 	}
 
-	private void createPdfRow(PdfPTable pdfTable, Font tableBody, Employee employee) {
-		PdfPCell idValue = new PdfPCell(new Paragraph(Integer.toString(employee.getEmployeeId()), tableBody));
+	private void createPdfRow(PdfPTable pdfTable, Font tableBody, T candidate) {
+		Employee emp = null;
+		Student stud = null;
+		if (candidate instanceof Employee) {
+			emp = (Employee<?>) candidate;
+		}
+		else if (candidate instanceof Student) {
+			stud = (Student<?>) candidate;
+		}
+		PdfPCell idValue = new PdfPCell(new Paragraph(Integer.toString(emp.getEmployeeId()), tableBody));
 		createPdfCell(pdfTable, idValue);
 
-		/*
-		 * PdfPCell firstNameValue = new PdfPCell(new Paragraph(employee.getFirstName(),
-		 * tableBody)); createPdfCell(pdfTable, firstNameValue);
-		 */
+		PdfPCell firstNameValue = new PdfPCell(new Paragraph(emp.getFirstName(), tableBody));
+		createPdfCell(pdfTable, firstNameValue);
 
-		/*
-		 * PdfPCell lastNameValue = new PdfPCell(new Paragraph(employee.getLastName(),
-		 * tableBody)); createPdfCell(pdfTable, lastNameValue);
-		 */
+		PdfPCell lastNameValue = new PdfPCell(new Paragraph(emp.getLastName(), tableBody));
+		createPdfCell(pdfTable, lastNameValue);
 
-		PdfPCell cityValue = new PdfPCell(new Paragraph(employee.getCity(), tableBody));
+		PdfPCell cityValue = new PdfPCell(new Paragraph(emp.getCity(), tableBody));
 		createPdfCell(pdfTable, cityValue);
 	}
 
@@ -127,17 +133,17 @@ public class PdfExcelAndCsvServiceImpl<T> implements PdfExcelAndCsvService<T> {
 		pdfTable.addCell(cellValue);
 	}
 
-	private PdfPCell createPdfHeader(PdfPTable pdfTable, Font tableHeader) {
+	private PdfPCell createPdfHeader(PdfPTable pdfTable, Font tableHeader ) {
 		PdfPCell employeeId = new PdfPCell(new Paragraph("Employee Id", tableHeader));
 		createEachColumnHeader(pdfTable, employeeId);
 
-		/*
-		 * PdfPCell firstName = new PdfPCell(new Paragraph("First Name", tableHeader));
-		 * createEachColumnHeader(pdfTable, firstName);
-		 * 
-		 * PdfPCell lastName = new PdfPCell(new Paragraph("Last Name", tableHeader));
-		 * createEachColumnHeader(pdfTable, lastName);
-		 */
+		
+		  PdfPCell firstName = new PdfPCell(new Paragraph("First Name", tableHeader));
+		  createEachColumnHeader(pdfTable, firstName);
+		  
+		  PdfPCell lastName = new PdfPCell(new Paragraph("Last Name", tableHeader));
+		  createEachColumnHeader(pdfTable, lastName);
+		 
 
 		PdfPCell city = new PdfPCell(new Paragraph("City", tableHeader));
 		createEachColumnHeader(pdfTable, city);

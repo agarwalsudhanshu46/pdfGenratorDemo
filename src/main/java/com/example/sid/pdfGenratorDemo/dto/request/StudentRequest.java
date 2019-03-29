@@ -2,6 +2,7 @@ package com.example.sid.pdfGenratorDemo.dto.request;
 
 import java.io.Serializable;
 
+import com.example.sid.pdfGenratorDemo.dto.request.CandidateRequest;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 

@@ -9,31 +9,43 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter
-@Setter
+
 @JsonTypeName("Student")
 public class Student extends Candidate implements Serializable {
+
+	public Student() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
 
 	private static final long serialVersionUID = -7043559940360535853L;
 
 	@JsonProperty(value= "studentId")
 	private int studentId;
 
-	@JsonProperty(value= "firstName")
-	private String firstName;
-
-	@JsonProperty(value= "lastName")
-	private String lastName;
-
 	@JsonProperty(value= "mobileNumber")
 	private String mobileNumber;
 
 	@JsonCreator
 	public Student(int studentId, String firstName, String lastName, String mobileNumber) {
-		super();
+		super(firstName, lastName);
 		this.studentId = studentId;
-		this.firstName = firstName;
-		this.lastName = lastName;
+		this.mobileNumber = mobileNumber;
+	}
+
+	public int getStudentId() {
+		return studentId;
+	}
+
+	public void setStudentId(int studentId) {
+		this.studentId = studentId;
+	}
+
+	public String getMobileNumber() {
+		return mobileNumber;
+	}
+
+	public void setMobileNumber(String mobileNumber) {
 		this.mobileNumber = mobileNumber;
 	}
 	

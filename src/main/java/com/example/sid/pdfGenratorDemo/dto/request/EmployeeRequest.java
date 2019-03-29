@@ -2,6 +2,7 @@ package com.example.sid.pdfGenratorDemo.dto.request;
 
 import java.io.Serializable;
 
+import com.example.sid.pdfGenratorDemo.dto.request.CandidateRequest;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
@@ -15,10 +16,10 @@ public class EmployeeRequest extends CandidateRequest implements Serializable {
 	private static final long serialVersionUID = 3598537965994686263L;
 
 	@JsonProperty(value = "employeeId")
-	private int employeeId;
+	private final int employeeId;
 
 	@JsonProperty(value = "city")
-	private String city;
+	private final String city;
 
 	public EmployeeRequest(String firstName, String lastName, int employeeId, String city) {
 		super(firstName, lastName);

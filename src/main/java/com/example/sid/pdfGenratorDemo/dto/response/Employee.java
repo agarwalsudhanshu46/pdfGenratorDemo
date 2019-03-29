@@ -2,40 +2,59 @@ package com.example.sid.pdfGenratorDemo.dto.response;
 
 import java.io.Serializable;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter
-@Setter
 @JsonTypeName("Employee")
 public class Employee extends Candidate implements Serializable {
 
 	private static final long serialVersionUID = -1221794581857450594L;
 
-	@JsonProperty(value= "employeeId")
+	@JsonProperty(value = "employeeId")
 	private int employeeId;
 
-	@JsonProperty(value= "firstName")
-	private String firstName;
-
-	@JsonProperty(value= "lastName")
-	private String lastName;
-
-	@JsonProperty(value= "city")
+	@JsonProperty(value = "city")
 	private String city;
 
-	@JsonCreator
-	public Employee(int employeeId, String firstName, String lastName, String city) {
-		super();
+	public Employee(String firstName, String lastName, int employeeId, String city) {
+		super(firstName, lastName);
 		this.employeeId = employeeId;
-		this.firstName = firstName;
-		this.lastName = lastName;
 		this.city = city;
+	}
+
+	public int getEmployeeId() {
+		return employeeId;
+	}
+
+	public void setEmployeeId(int employeeId) {
+		this.employeeId = employeeId;
+	}
+
+	public String getCity() {
+		return city;
+	}
+
+	public void setCity(String city) {
+		this.city = city;
+	}
+
+	public Employee() {
+		super();
+		// TODO Auto-generated constructor stub
 	}
 	
 	
+	
+	
+	
+	
+	
+	
+	
+	
+
 }

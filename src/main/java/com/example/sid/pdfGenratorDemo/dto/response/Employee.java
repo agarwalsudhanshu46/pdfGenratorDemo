@@ -9,11 +9,16 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-@JsonTypeName("Employee")
-public class Employee<T> extends Candidate implements Serializable {
+//@JsonTypeName("Employee")
+public class Employee  {
 
-	private static final long serialVersionUID = -1221794581857450594L;
 
+	@JsonProperty(value = "firstName")
+	private  String firstName;
+
+	@JsonProperty(value = "lastName")
+	private  String lastName;
+	
 	@JsonProperty(value = "employeeId")
 	private int employeeId;
 
@@ -21,9 +26,10 @@ public class Employee<T> extends Candidate implements Serializable {
 	private String city;
 
 	public Employee(String firstName, String lastName, int employeeId, String city) {
-		super(firstName, lastName);
 		this.employeeId = employeeId;
 		this.city = city;
+		this.firstName = firstName;
+		this.lastName = lastName;
 	}
 
 	public int getEmployeeId() {
@@ -42,6 +48,22 @@ public class Employee<T> extends Candidate implements Serializable {
 		this.city = city;
 	}
 
+	public String getFirstName() {
+		return firstName;
+	}
+
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+
+	public String getLastName() {
+		return lastName;
+	}
+
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
+	
 	public Employee() {
 		super();
 		// TODO Auto-generated constructor stub

@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.ServletContext;
@@ -17,8 +18,11 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.util.HSSFColor;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
+import com.example.sid.pdfGenratorDemo.constant.FileConstant;
 import com.example.sid.pdfGenratorDemo.dto.response.Employee;
 import com.example.sid.pdfGenratorDemo.dto.response.Student;
 import com.example.sid.pdfGenratorDemo.service.PdfExcelAndCsvService;
@@ -40,11 +44,11 @@ import au.com.bytecode.opencsv.CSVWriter;
 public class PdfExcelAndCsvServiceImpl<T> implements PdfExcelAndCsvService<T> {
 
 	@Override
-	public boolean createPdf(List<T> candidates, ServletContext context, HttpServletRequest request,
-			HttpServletResponse response) {
+	public boolean createPdf(JSONArray jsonArray, ServletContext context, HttpServletRequest request,
+			HttpServletResponse response, List<String> columns, String type) {
 		Document document = new Document(PageSize.A4, 15, 15, 45, 30);
 
-		String filePath = context.getRealPath("/resources/reports");
+		String filePath = context.getRealPath(FileConstant.resourceFolder);
 		File file = new File(filePath);
 		boolean fileExist = new File(filePath).exists();
 		if (!fileExist) {
@@ -52,36 +56,64 @@ public class PdfExcelAndCsvServiceImpl<T> implements PdfExcelAndCsvService<T> {
 		}
 		try {
 			PdfWriter pdfwriter = PdfWriter.getInstance(document,
-					new FileOutputStream(file + "/" + "employees" + ".pdf"));
+					new FileOutputStream(file + "/" + FileConstant.employeePdfExtension));
 			document.open();
-			Font mainFont = FontFactory.getFont("Arial", 10, BaseColor.BLACK);
-
-			createAndAddParagraphOnDocument(document, mainFont);
-
+			Font mainFont = FontFactory.getFont(FileConstant.fontType, 10, BaseColor.BLACK);
+			createAndAddParagraphOnDocument(document, mainFont, type);
 			PdfPTable pdfTable = createPdfTable();
-
-			Font tableHeader = FontFactory.getFont("Arial", 10, BaseColor.BLACK);
-			Font tableBody = FontFactory.getFont("Arial", 9, BaseColor.BLACK);
-
+			Font tableHeader = FontFactory.getFont(FileConstant.fontType, 10, BaseColor.BLACK);
+			Font tableBody = FontFactory.getFont(FileConstant.fontType, 9, BaseColor.BLACK);
 			float[] columnWidths = { 2f, 2f, 2f, 2f };
 			pdfTable.setWidths(columnWidths);
+			columns.stream().forEach(column -> createEachColumnHeader(pdfTable, tableHeader, column));
 			
-			createPdfHeader(pdfTable, tableHeader);
-
-/*			for (T employee : employees) {
-				createPdfRow(pdfTable, tableBody, employee);
-			}*/
-			candidates.forEach(candidate -> createPdfRow(pdfTable, tableBody, candidate));
-
+			
+/*			jsonArray.forEach(json -> {
+				createPdfRow(pdfTable, tableBody, json);
+			});*/
+			
+			for(int i = 0; i < jsonArray.length(); i++)
+			{
+			      JSONObject jsonObject = jsonArray.getJSONObject(i);
+			      List<String> responseData = new ArrayList<>();
+			      jsonObject.keySet().forEach(keyStr ->
+			      {
+			          String keyValue = (String) jsonObject.get((String) keyStr);
+			          responseData.add(keyValue);
+			      });
+			      createPdfRow(pdfTable, tableBody, responseData);
+			      responseData.clear();
+			}
+			
+			
 			document.add(pdfTable);
 			document.close();
 			pdfwriter.close();
 			return true;
-
 		} catch (Exception e) {
 			return false;
 		}
 
+	}
+	
+	private void createPdfRow(PdfPTable pdfTable, Font tableBody, List<String> responseData) {
+/*		Employee emp = null;
+		Student stud = null;
+		if (candidate instanceof Employee) {
+			emp = (Employee) candidate;
+			createPdfCell(pdfTable, tableBody, Integer.toString(emp.getEmployeeId()));
+			createPdfCell(pdfTable, tableBody, emp.getFirstName());
+			createPdfCell(pdfTable, tableBody, emp.getLastName());
+			createPdfCell(pdfTable, tableBody, emp.getCity());
+		} else if (candidate instanceof Student) {
+			stud = (Student) candidate;
+			createPdfCell(pdfTable, tableBody, Integer.toString(stud.getStudentId()));
+			createPdfCell(pdfTable, tableBody, stud.getFirstName());
+			createPdfCell(pdfTable, tableBody, stud.getLastName());
+			createPdfCell(pdfTable, tableBody, stud.getMobileNumber());
+		}*/
+		responseData.forEach(fieldValue -> createPdfCell(pdfTable, tableBody, fieldValue));
+		
 	}
 
 	private PdfPTable createPdfTable() {
@@ -92,8 +124,9 @@ public class PdfExcelAndCsvServiceImpl<T> implements PdfExcelAndCsvService<T> {
 		return pdfTable;
 	}
 
-	private void createAndAddParagraphOnDocument(Document document, Font mainFont) throws DocumentException {
-		Paragraph paragraph = new Paragraph("All Employees", mainFont);
+	private void createAndAddParagraphOnDocument(Document document, Font mainFont, String type)
+			throws DocumentException {
+		Paragraph paragraph = new Paragraph(type, mainFont);
 		paragraph.setAlignment(Element.ALIGN_CENTER);
 		paragraph.setIndentationLeft(50);
 		paragraph.setIndentationRight(50);
@@ -101,56 +134,10 @@ public class PdfExcelAndCsvServiceImpl<T> implements PdfExcelAndCsvService<T> {
 		document.add(paragraph);
 	}
 
-	private void createPdfRow(PdfPTable pdfTable, Font tableBody, T candidate) {
-		Employee emp = null;
-		Student stud = null;
-		if (candidate instanceof Employee) {
-			emp = (Employee<?>) candidate;
-		}
-		else if (candidate instanceof Student) {
-			stud = (Student<?>) candidate;
-		}
-		PdfPCell idValue = new PdfPCell(new Paragraph(Integer.toString(emp.getEmployeeId()), tableBody));
-		createPdfCell(pdfTable, idValue);
 
-		PdfPCell firstNameValue = new PdfPCell(new Paragraph(emp.getFirstName(), tableBody));
-		createPdfCell(pdfTable, firstNameValue);
 
-		PdfPCell lastNameValue = new PdfPCell(new Paragraph(emp.getLastName(), tableBody));
-		createPdfCell(pdfTable, lastNameValue);
-
-		PdfPCell cityValue = new PdfPCell(new Paragraph(emp.getCity(), tableBody));
-		createPdfCell(pdfTable, cityValue);
-	}
-
-	private void createPdfCell(PdfPTable pdfTable, PdfPCell cellValue) {
-		cellValue.setBorderColor(BaseColor.BLACK);
-		cellValue.setPaddingLeft(10);
-		cellValue.setHorizontalAlignment(Element.ALIGN_CENTER);
-		cellValue.setHorizontalAlignment(Element.ALIGN_CENTER);
-		cellValue.setBackgroundColor(BaseColor.WHITE);
-		cellValue.setExtraParagraphSpace(5f);
-		pdfTable.addCell(cellValue);
-	}
-
-	private PdfPCell createPdfHeader(PdfPTable pdfTable, Font tableHeader ) {
-		PdfPCell employeeId = new PdfPCell(new Paragraph("Employee Id", tableHeader));
-		createEachColumnHeader(pdfTable, employeeId);
-
-		
-		  PdfPCell firstName = new PdfPCell(new Paragraph("First Name", tableHeader));
-		  createEachColumnHeader(pdfTable, firstName);
-		  
-		  PdfPCell lastName = new PdfPCell(new Paragraph("Last Name", tableHeader));
-		  createEachColumnHeader(pdfTable, lastName);
-		 
-
-		PdfPCell city = new PdfPCell(new Paragraph("City", tableHeader));
-		createEachColumnHeader(pdfTable, city);
-		return employeeId;
-	}
-
-	private void createEachColumnHeader(PdfPTable pdfTable, PdfPCell columnName) {
+	private void createEachColumnHeader(PdfPTable pdfTable, Font tableHeader, String column) {
+		PdfPCell columnName = new PdfPCell(new Paragraph(column, tableHeader));
 		columnName.setBorderColor(BaseColor.BLACK);
 		columnName.setPaddingLeft(10);
 		columnName.setHorizontalAlignment(Element.ALIGN_CENTER);
@@ -160,10 +147,23 @@ public class PdfExcelAndCsvServiceImpl<T> implements PdfExcelAndCsvService<T> {
 		pdfTable.addCell(columnName);
 	}
 
+
+
+	private void createPdfCell(PdfPTable pdfTable, Font tableBody, String value) {
+		PdfPCell cellValue = new PdfPCell(new Paragraph(value, tableBody));
+		cellValue.setBorderColor(BaseColor.BLACK);
+		cellValue.setPaddingLeft(10);
+		cellValue.setHorizontalAlignment(Element.ALIGN_CENTER);
+		cellValue.setHorizontalAlignment(Element.ALIGN_CENTER);
+		cellValue.setBackgroundColor(BaseColor.WHITE);
+		cellValue.setExtraParagraphSpace(5f);
+		pdfTable.addCell(cellValue);
+	}
+
 	@Override
 	public boolean createExcel(List<Employee> employees, ServletContext context, HttpServletRequest request,
 			HttpServletResponse response) {
-		String filePath = context.getRealPath("/resources/reports");
+		String filePath = context.getRealPath(FileConstant.resourceFolder);
 		File file = new File(filePath);
 		boolean fileExist = new File(filePath).exists();
 		if (!fileExist) {

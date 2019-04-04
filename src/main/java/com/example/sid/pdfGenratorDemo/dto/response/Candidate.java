@@ -9,8 +9,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import lombok.Data;
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
-@JsonSubTypes({ @Type(value = Employee.class, name = "Employee"), @Type(value = Student.class, name = "Student") })
+/*@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+@JsonSubTypes({ @Type(value = Employee.class, name = "Employee"), @Type(value = Student.class, name = "Student") })*/
 public class Candidate implements Serializable {
 
 	private static final long serialVersionUID = -1769865478170350865L;

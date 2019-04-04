@@ -9,9 +9,8 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import lombok.Getter;
 import lombok.Setter;
 
-
 @JsonTypeName("Student")
-public class Student<T> extends Candidate implements Serializable {
+public class Student extends Candidate implements Serializable {
 
 	public Student() {
 		super();
@@ -20,10 +19,10 @@ public class Student<T> extends Candidate implements Serializable {
 
 	private static final long serialVersionUID = -7043559940360535853L;
 
-	@JsonProperty(value= "studentId")
+	@JsonProperty(value = "studentId")
 	private int studentId;
 
-	@JsonProperty(value= "mobileNumber")
+	@JsonProperty(value = "mobileNumber")
 	private String mobileNumber;
 
 	@JsonCreator
@@ -48,7 +47,5 @@ public class Student<T> extends Candidate implements Serializable {
 	public void setMobileNumber(String mobileNumber) {
 		this.mobileNumber = mobileNumber;
 	}
-	
-	
 
 }

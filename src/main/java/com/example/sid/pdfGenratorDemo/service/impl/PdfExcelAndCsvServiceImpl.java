@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.ServletContext;
@@ -76,13 +77,21 @@ public class PdfExcelAndCsvServiceImpl<T> implements PdfExcelAndCsvService<T> {
 			{
 			      JSONObject jsonObject = jsonArray.getJSONObject(i);
 			      List<String> responseData = new ArrayList<>();
-			      jsonObject.keySet().forEach(keyStr ->
+			      Iterator<String> iterator = jsonObject.keys();
+			      while(iterator.hasNext()) {
+			    	  String key = (String) iterator.next();
+			    	  String keyValue = (String) jsonObject.get((String) key);
+			    	  responseData.add(keyValue);
+				      createPdfRow(pdfTable, tableBody, responseData);
+				      responseData.clear();
+			      }
+			      
+/*			      jsonObject.keys.forEach(keyStr ->
 			      {
 			          String keyValue = (String) jsonObject.get((String) keyStr);
 			          responseData.add(keyValue);
-			      });
-			      createPdfRow(pdfTable, tableBody, responseData);
-			      responseData.clear();
+			      });*/
+
 			}
 			
 			

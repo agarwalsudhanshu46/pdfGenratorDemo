@@ -1,31 +1,30 @@
 package com.example.sid.pdfGenratorDemo.configLoader;
 
-import javax.validation.constraints.NotNull;
-
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
-
-@Configuration
-@ConfigurationProperties(prefix="mysql")
-@Getter
-@Setter
-@PropertySource("classpath:/config.properties")
+//@Configuration
+@ConfigurationProperties(prefix = "mysql")
+@Data
+@PropertySource("classpath:config.properties")
 public class MySqlConfigLoader {
-	@NotNull
+
+	@Value("${mysql.url}")
 	private String url;
-	@NotNull
+	@Value("${mysql.username}")
 	private String username;
-	@NotNull
+	@Value("${mysql.password}")
 	private String password;
-	@NotNull
+	@Value("${mysql.driver}")
 	private String driver;
-	@NotNull
+	@Value("${mysql.dialect}")
 	private String dialect;
+
+	public String getUrl() {
+		return url;
+	}
 
 }
